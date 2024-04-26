@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UPSC Time</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #6e9ee7, #c3cfe2);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .heading {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            /* text-transform: uppercase; */
+        }
+
+        .container {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .container:hover {
+            transform: scale(1.05);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            transition: border 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #00aaff;
+        }
+
+        button {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #ff4b4b;
+            transform: scale(1.1);
+        }
+
+        #countdown {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+    </style>
+    <script>
+        let timerInterval = null;
+
+        function startCountdown() {
+            const startDateInput = document.getElementById("start-date").value;
+            const endDateInput = document.getElementById("end-date").value;
+
+            if (startDateInput && endDateInput) {
+                const startDate = new Date(startDateInput);
+                const endDate = new Date(endDateInput);
+
+                if (endDate <= startDate) {
+                    alert("End date must be later than start date.");
+                    return;
+                }
+
+                // Clear any existing timer
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+
+                // Save the start and end dates to localStorage
+                localStorage.setItem("startDate", startDateInput);
+                localStorage.setItem("endDate", endDateInput);
+
+                const updateTimer = () => {
+                    const now = new Date();
+                    const timeRemaining = endDate - now;
+
+                    if (timeRemaining <= 0) {
+                        document.getElementById("countdown").innerText = "Time is up!";
+                        return;
+                    }
+
+                    const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                    document.getElementById("countdown").innerText = `Remaining: ${hours} hours, ${minutes} minutes and ${seconds} seconds`;
+                };
+
+                updateTimer();  // Immediate update
+                timerInterval = setInterval(updateTimer, 1000); // Update every second
+            } else {
+                alert("Please enter both start and end dates.");
+            }
+        }
+
+        function loadSavedDates() {
+            const startDateInput = localStorage.getItem("startDate");
+            const endDateInput = localStorage.getItem("endDate");
+
+            if (startDateInput && endDateInput) {
+                document.getElementById("start-date").value = startDateInput;
+                document.getElementById("end-date").value = endDateInput;
+                startCountdown();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadSavedDates);
+    </script>
+</head>
+<body>
+    <h1 class="heading">UPSC Time Remaining</h1>
+    <div class="container">
+        <h2>Persistent Countdown Timer</h2>
+        <div class="input-group">
+            <label for="start-date">Start Date:</label>
+            <input type="datetime-local" id="start-date">
+        </div>
+        <div class="input-group">
+            <label for="end-date">End Date:</label>
+            <input type="datetime-local" id="end-date">
+        </div>
+        <button onclick="startCountdown()">Start Countdown</button>
+        <p id="countdown"></p>
+    </div>
+</body>
+</html>
