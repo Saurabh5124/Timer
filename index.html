@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>UPSC Time</title>
+    <title>UPSC Time Remaining</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -27,7 +28,6 @@
             font-size: 24px;
             font-weight: 700;
             color: #333;
-            /* text-transform: uppercase; */
         }
 
         .container {
@@ -36,6 +36,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
+            text-align: center;
         }
 
         .container:hover {
@@ -68,16 +69,14 @@
             background-color: #ff6b6b;
             color: white;
             padding: 10px 20px;
-            border: none;
             border-radius: 10px;
-            cursor: pointer;
             font-weight: 700;
             transition: background-color 0.3s, transform 0.3s;
         }
 
         button:hover {
             background-color: #ff4b4b;
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         #countdown {
@@ -85,9 +84,34 @@
             font-size: 18px;
             font-weight: 700;
         }
+
+        @media (max-width: 480px) {
+            .heading {
+                font-size: 18px;
+            }
+
+            .container {
+                padding: 15px;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            #countdown {
+                font-size: 16px;
+            }
+        }
     </style>
     <script>
         let timerInterval = null;
+
+        function formatDateTimeForInput(date) {
+            const year = date.getFullYear();
+            const month = (`0${date.getMonth() + 1}`).slice(-2);
+            const day = (`0${date.getDate()}`).slice(-2);
+            const hours = (`0${date.getHours()}`).slice(-2);
+            const minutes = (`0${date.getMinutes()}`).slice(-2);
+
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
 
         function startCountdown() {
             const startDateInput = document.getElementById("start-date").value;
@@ -102,12 +126,10 @@
                     return;
                 }
 
-                // Clear any existing timer
                 if (timerInterval) {
                     clearInterval(timerInterval);
                 }
 
-                // Save the start and end dates to localStorage
                 localStorage.setItem("startDate", startDateInput);
                 localStorage.setItem("endDate", endDateInput);
 
@@ -117,6 +139,7 @@
 
                     if (timeRemaining <= 0) {
                         document.getElementById("countdown").innerText = "Time is up!";
+                        clearInterval(timerInterval);
                         return;
                     }
 
@@ -124,28 +147,25 @@
                     const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-                    document.getElementById("countdown").innerText = `Remaining: ${hours} hours, ${minutes} minutes and ${seconds} seconds`;
+                    document.getElementById("countdown").innerText = `Remaining: ${hours} hours, ${minutes}, and ${seconds} seconds`;
                 };
 
-                updateTimer();  // Immediate update
-                timerInterval = setInterval(updateTimer, 1000); // Update every second
+                updateTimer();
+                timerInterval = setInterval(updateTimer, 1000);
             } else {
                 alert("Please enter both start and end dates.");
             }
         }
 
-        function loadSavedDates() {
-            const startDateInput = localStorage.getItem("startDate");
-            const endDateInput = localStorage.getItem("endDate");
+        function loadDefaultStartDate() {
+            const startDateInput = document.getElementById("start-date");
+            const now = new Date();
 
-            if (startDateInput && endDateInput) {
-                document.getElementById("start-date").value = startDateInput;
-                document.getElementById("end-date").value = endDateInput;
-                startCountdown();
-            }
+            // Set the default start date to the current date/time
+            startDateInput.value = formatDateTimeForInput(now);
         }
 
-        document.addEventListener("DOMContentLoaded", loadSavedDates);
+        document.addEventListener("DOMContentLoaded", loadDefaultStartDate);
     </script>
 </head>
 <body>
